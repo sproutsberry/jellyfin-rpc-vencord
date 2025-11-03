@@ -128,8 +128,6 @@ export default definePlugin({
 
         const sessions = await this.getSessions();
 
-        console.log("SESSIONS", sessions);
-
         FluxDispatcher.dispatch({
             type: "LOCAL_ACTIVITY_UPDATE",
             socketId: "Jellyfin",
