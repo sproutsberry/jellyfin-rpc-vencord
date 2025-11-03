@@ -21,11 +21,15 @@ export const audioHandler = {
     async getImage(item) {
         const release = item.ProviderIds.MusicBrainzAlbum;
         if (release) {
-            const data = await fetch(`https://coverartarchive.org/release/${release}`).then(response => response.json());
+            const response = await fetch(`https://coverartarchive.org/release/${release}`);
 
-            for (const image of data.images) {
-                if (image.front) {
-                    return image.thumbnails.small;
+            if (response.ok) {
+                const data = await response.json();
+
+                for (const image of data.images) {
+                    if (image.front) {
+                        return image.thumbnails.small;
+                    }
                 }
             }
         }
@@ -51,8 +55,11 @@ export const movieHandler = {
         if (settings.store.tmdbAPIKey) {
             const tmdb = item.ProviderIds.Tmdb;
             if (tmdb) {
-                const details = await fetch(`https://api.themoviedb.org/3/movie/${tmdb}?api_key=${settings.store.tmdbAPIKey}`).then(response => response.json());
-                return "http://image.tmdb.org/t/p/w500" + details.poster_path;
+                const response = await fetch(`https://api.themoviedb.org/3/movie/${tmdb}?api_key=${settings.store.tmdbAPIKey}`);
+                if (response.ok) {
+                    const details = await response.json();
+                    return "http://image.tmdb.org/t/p/w500" + details.poster_path;
+                }
             }
         }
 

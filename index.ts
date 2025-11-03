@@ -82,7 +82,7 @@ export default definePlugin({
             const result = handler.getActivity(item);
 
             let imageURL = this.imageCache[item.Id];
-            if (!imageURL) {
+            if (imageURL === undefined) {
                 try {
                     imageURL = await handler.getImage(item);
                 } catch (error) {
@@ -127,6 +127,8 @@ export default definePlugin({
         if (!settings.store.jellyfinUsername) return;
 
         const sessions = await this.getSessions();
+
+        console.log("SESSIONS", sessions);
 
         FluxDispatcher.dispatch({
             type: "LOCAL_ACTIVITY_UPDATE",
