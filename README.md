@@ -9,4 +9,4 @@
 - In `Vencord/src/userplugins`, `git clone https://github.com/sproutsberry/vencord-jellyfin-rpc.git`
 - Rebuild Vencord by running `pnpm build` in your root `Vencord` folder
 
-To update Vencord or Jellyfin Rich Presence, run `git pull` in your `Vencord` or `Vencord/src/vencord-jellyfin-rpc` folders respectively.
+To update Vencord or Jellyfin Rich Presence, run `git pull` in your `Vencord` or `Vencord/src/userplugins/vencord-jellyfin-rpc` folders respectively.
