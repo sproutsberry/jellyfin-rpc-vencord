@@ -2,6 +2,13 @@
 
 ![Music Example](images/example-music.png) ![Movie Example](images/example-movie.png)
 
+### Implemented
+
+- [X] Music
+- [X] Movies
+- [ ] TV Shows
+- [ ] Books
+
 ## Installation
 
 - Follow the instructions to make a [Vencord Development Installation](https://docs.vencord.dev/installing/)
