@@ -28,6 +28,11 @@ export default definePluginSettings({
         type: OptionType.BOOLEAN,
         default: true,
     },
+    shows: {
+        description: "Should Shows be displayed on your profile?",
+        type: OptionType.BOOLEAN,
+        default: true,
+    },
 
     // API
     tmdbAPIKey: {

@@ -1,12 +1,12 @@
 # Jellyfin Rich Presence for Vencord
 
-![Music Example](images/example-music.png) ![Movie Example](images/example-movie.png)
+![Music Example](images/example-music.png) ![Movie Example](images/example-movie.png) ![Show Example](images/example-show.png)
 
 ### Implemented
 
 - [X] Music
 - [X] Movies
-- [ ] TV Shows
+- [X] TV Shows
 - [ ] Books
 
 ## Installation

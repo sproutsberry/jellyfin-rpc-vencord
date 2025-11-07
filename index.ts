@@ -64,6 +64,7 @@ export default definePlugin({
             if (!item) return false;
             if (item.Type === "Audio" && !settings.store.audio) return false;
             if (item.Type === "Movie" && !settings.store.movies) return false;
+            if (item.Type === "Episode" && !settings.store.shows) return false;
 
             return true;
         });
