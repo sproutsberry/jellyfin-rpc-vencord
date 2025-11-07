@@ -31,7 +31,7 @@ export default definePluginSettings({
 
     // API
     tmdbAPIKey: {
-        description: "For movie covers",
+        description: "For extra movie metadata and covers",
         type: OptionType.STRING,
         restartNeeded: true,
     },
