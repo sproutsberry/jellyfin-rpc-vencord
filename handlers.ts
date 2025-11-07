@@ -5,13 +5,13 @@ export const audioHandler = {
     icon: "audio",
 
     getActivity(item) {
-        const { MusicBrainzRecording: recordingID, MusicBrainzArtist: artistID } = item.ProviderIds;
+        const { MusicBrainzAlbum: releaseID, MusicBrainzArtist: artistID } = item.ProviderIds;
 
         return {
             type: ActivityType.LISTENING,
             statusType: ActivityStatusDisplayType.STATE,
             details: item.Name,
-            detailsURL: recordingID ? `https://musicbrainz.org/recording/${recordingID}` : undefined,
+            detailsURL: releaseID ? `https://musicbrainz.org/release/${releaseID}` : undefined,
             state: item.Artists.join(", "),
             stateURL: artistID ? `https://musicbrainz.org/artist/${artistID}` : undefined,
             image: item.Album,
