@@ -79,6 +79,7 @@ export const movieHandler = {
                         details: details.title,
                         detailsURL: `https://www.themoviedb.org/movie/${tmdbID}`,
                         state: state.join(DETAIL_DELIMITER),
+                        stateURL: director ? `https://www.themoviedb.org/person/${director.id}` : null,
                         imageURL: TMDB_IMAGE_URL + details.poster_path,
                     }
                 }
