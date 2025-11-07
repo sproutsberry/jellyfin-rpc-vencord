@@ -16,16 +16,12 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
 */
 
-import definePlugin, { OptionType } from "@utils/types";
-import { Logger } from "@utils/Logger";
-import { definePluginSettings } from "@api/Settings";
+import definePlugin from "@utils/types";
 import { ApplicationAssetUtils, FluxDispatcher } from "@webpack/common";
 import { ActivityFlags } from "@vencord/discord-types/enums";
 import handlers from "./handlers";
 import settings from "./settings";
 import { addOverride, ensureAllOverrides } from "./csp";
-
-const logger = new Logger("JellyfinRichPresence");
 
 export default definePlugin({
     name: "JellyfinRichPresence",
@@ -73,45 +69,38 @@ export default definePlugin({
         });
     },
 
-    imageCache: {},
+    activityCache: {},
     async buildActivity(session) {
         const item = session.NowPlayingItem;
         const handler = handlers[item.Type];
 
         if (handler) {
-            const result = handler.getActivity(item);
-
-            let imageURL = this.imageCache[item.Id];
-            if (imageURL === undefined) {
-                try {
-                    imageURL = await handler.getImage(item);
-                } catch (error) {
-                    logger.error(`Failed to fetch image for ${item.Name}`, error);
-                    imageURL = null;
-                }
-                this.imageCache[item.Id] = imageURL;
+            let activity = this.activityCache[item.Id];
+            if (activity === undefined) {
+                activity = await handler.getActivity(item);
+                this.activityCache[item.Id] = activity;
             }
 
             const startTime = Date.now() - session.PlayState.PositionTicks / 10000;
             const endTime = startTime + item.RunTimeTicks / 10000;
 
-            const [imageAsset] = await ApplicationAssetUtils.fetchAssetIds(settings.store.applicationID, [imageURL ?? handler.icon]);
+            const [ imageAsset ] = await ApplicationAssetUtils.fetchAssetIds(settings.store.applicationID, [ activity.imageURL ?? handler.icon ]);
 
             return {
                 application_id: settings.store.applicationID,
                 flags: ActivityFlags.INSTANCE,
 
                 name: settings.store.applicationName,
-                type: result.type,
-                status_display_type: result.statusType,
-                details: result.details,
-                details_url: result.detailsURL,
-                state: result.state,
-                state_url: result.stateURL,
+                type: activity.type,
+                status_display_type: activity.statusType,
+                details: activity.details,
+                details_url: activity.detailsURL,
+                state: activity.state,
+                state_url: activity.stateURL,
                 timestamps: { start: startTime, end: endTime },
                 assets: {
                     large_image: imageAsset,
-                    large_text: result.image ?? null,
+                    large_text: activity.imageCaption ?? null,
                     small_image: null,
                     small_text: null,
                 },
