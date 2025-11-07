@@ -5,23 +5,23 @@ export const audioHandler = {
     icon: "audio",
 
     getActivity(item) {
-        const providers = item.ProviderIds;
+        const { MusicBrainzRecording: recordingID, MusicBrainzArtist: artistID } = item.ProviderIds;
 
         return {
             type: ActivityType.LISTENING,
             statusType: ActivityStatusDisplayType.STATE,
             details: item.Name,
-            detailsURL: providers.MusicBrainzRecording ? `https://musicbrainz.org/recording/${providers.MusicBrainzRecording}` : undefined,
+            detailsURL: recordingID ? `https://musicbrainz.org/recording/${recordingID}` : undefined,
             state: item.Artists.join(", "),
-            stateURL: providers.MusicBrainzArtist ? `https://musicbrainz.org/artist/${providers.MusicBrainzArtist}` : undefined,
+            stateURL: artistID ? `https://musicbrainz.org/artist/${artistID}` : undefined,
             image: item.Album,
         };
     },
 
     async getImage(item) {
-        const release = item.ProviderIds.MusicBrainzAlbum;
-        if (release) {
-            const response = await fetch(`https://coverartarchive.org/release/${release}`);
+        const releaseID = item.ProviderIds.MusicBrainzAlbum;
+        if (releaseID) {
+            const response = await fetch(`https://coverartarchive.org/release/${releaseID}`);
 
             if (response.ok) {
                 const data = await response.json();
@@ -38,6 +38,8 @@ export const audioHandler = {
     },
 };
 
+const TMDB_IMAGE_PREFIX = "http://image.tmdb.org/t/p/w500";
+
 export const movieHandler = {
     icon: "movie",
 
@@ -53,12 +55,19 @@ export const movieHandler = {
 
     async getImage(item) {
         if (settings.store.tmdbAPIKey) {
-            const tmdb = item.ProviderIds.Tmdb;
-            if (tmdb) {
-                const response = await fetch(`https://api.themoviedb.org/3/movie/${tmdb}?api_key=${settings.store.tmdbAPIKey}`);
+            const { Tmdb: tmdbID, Imdb: imdbID } = item.ProviderIds;
+
+            if (tmdbID) {
+                const response = await fetch(`https://api.themoviedb.org/3/movie/${tmdbID}?api_key=${settings.store.tmdbAPIKey}`);
                 if (response.ok) {
                     const details = await response.json();
-                    return "http://image.tmdb.org/t/p/w500" + details.poster_path;
+                    return TMDB_IMAGE_PREFIX + details.poster_path;
+                }
+            } else if (imdbID) {
+                const response = await fetch(`https://api.themoviedb.org/3/find/${imdbID}?api_key=${settings.store.tmdbAPIKey}`);
+                if (response.ok) {
+                    const { movie_results: results } = await response.json();
+                    return results.length > 0 ? TMDB_IMAGE_PREFIX + results[0].poster_path : null;
                 }
             }
         }
