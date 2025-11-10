@@ -65,25 +65,28 @@ export default definePlugin({
             if (item.Type === "Audio" && !settings.store.audio) return false;
             if (item.Type === "Movie" && !settings.store.movies) return false;
             if (item.Type === "Episode" && !settings.store.shows) return false;
+            if (item.Type === "Book" && !settings.store.books) return false;
 
             return true;
         });
     },
 
-    activityCache: {},
+    metadataCache: {},
     async buildActivity(session) {
         const item = session.NowPlayingItem;
         const handler = handlers[item.Type];
 
         if (handler) {
-            let activity = this.activityCache[item.Id];
-            if (activity === undefined) {
-                activity = await handler.getActivity(item);
-                this.activityCache[item.Id] = activity;
+            let metadata = this.metadataCache[item.Id];
+            if (metadata === undefined) {
+                metadata = await handler.getMetadata(item);
+                this.metadataCache[item.Id] = metadata;
             }
 
-            const startTime = Date.now() - session.PlayState.PositionTicks / 10000;
-            const endTime = startTime + item.RunTimeTicks / 10000;
+            const activity = {
+                ...metadata,
+                ...handler.getProgress(item, session.PlayState.PositionTicks),
+            }
 
             const [ imageAsset ] = await ApplicationAssetUtils.fetchAssetIds(settings.store.applicationID, [ activity.imageURL ?? handler.icon ]);
 
@@ -98,7 +101,7 @@ export default definePlugin({
                 details_url: activity.detailsURL,
                 state: activity.state,
                 state_url: activity.stateURL,
-                timestamps: { start: startTime, end: endTime },
+                timestamps: activity.timestamps,
                 assets: {
                     large_image: imageAsset,
                     large_text: activity.imageCaption ?? null,
@@ -117,6 +120,8 @@ export default definePlugin({
         if (!settings.store.jellyfinUsername) return;
 
         const sessions = await this.getSessions();
+
+        console.log("SESSIONS", sessions);
 
         FluxDispatcher.dispatch({
             type: "LOCAL_ACTIVITY_UPDATE",

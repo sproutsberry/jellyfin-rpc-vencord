@@ -15,10 +15,19 @@ function tmdbURLtoID(url: string) {
     return result ? result[1] : null
 }
 
+function getTimeProgress(item, position) {
+    const start = Date.now() - position / 10000;
+    const end = start + item.RunTimeTicks / 10000;
+
+    return {
+        timestamps: { start, end },
+    }
+}
+
 export const audioHandler = {
     icon: "audio",
 
-    async getActivity(item) {
+    async getMetadata(item) {
         const { MusicBrainzAlbum: releaseID, MusicBrainzArtist: artistID } = item.ProviderIds;
 
         let imageURL;
@@ -50,12 +59,14 @@ export const audioHandler = {
             imageURL,
         };
     },
+
+    getProgress: getTimeProgress,
 };
 
 export const movieHandler = {
     icon: "movie",
 
-    async getActivity(item) {
+    async getMetadata(item) {
         const { Tmdb: tmdbID } = item.ProviderIds;
 
         if (settings.store.tmdbAPIKey && tmdbID) {
@@ -96,12 +107,14 @@ export const movieHandler = {
             state: item.ProductionYear,
         };
     },
+
+    getProgress: getTimeProgress,
 };
 
 const episodeHandler = {
     icon: "show",
 
-    async getActivity(item) {
+    async getMetadata(item) {
         const { Tmdb: tmdbEpisodeID } = item.ProviderIds;
 
         let imageURL;
@@ -132,10 +145,38 @@ const episodeHandler = {
             imageURL,
         }
     },
+
+    getProgress: getTimeProgress,
 };
+
+const bookHandler = {
+    icon: "book",
+
+    async getMetadata(item) {
+        return {
+            type: ActivityType.STREAMING,
+            statusType: ActivityStatusDisplayType.DETAILS,
+            details: item.Name,
+        }
+    },
+
+    getProgress(item, position) {
+        if (item.Path.toLowerCase().endsWith(".epub")) {
+            const progress = Math.min(position / item.RunTimeTicks, 1)
+            return {
+                state: `${Math.floor(progress * 100)}% read`,
+            }
+        } else {
+            return {
+                state: `Page ${(position / 10000) + 1}`,
+            }
+        }
+    },
+}
 
 export default {
     Audio: audioHandler,
     Movie: movieHandler,
     Episode: episodeHandler,
+    Book: bookHandler,
 };

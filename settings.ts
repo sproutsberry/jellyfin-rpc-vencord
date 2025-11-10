@@ -33,6 +33,11 @@ export default definePluginSettings({
         type: OptionType.BOOLEAN,
         default: true,
     },
+    books: {
+        description: "Should Books be displayed on your profile?",
+        type: OptionType.BOOLEAN,
+        default: true,
+    },
 
     // API
     tmdbAPIKey: {
