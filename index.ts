@@ -22,6 +22,7 @@ import { ActivityFlags } from "@vencord/discord-types/enums";
 import handlers from "./handlers";
 import settings from "./settings";
 import { addOverride, ensureAllOverrides } from "./csp";
+import logger from "./logger";
 
 export default definePlugin({
     name: "JellyfinRichPresence",
@@ -120,8 +121,6 @@ export default definePlugin({
         if (!settings.store.jellyfinUsername) return;
 
         const sessions = await this.getSessions();
-
-        console.log("SESSIONS", sessions);
 
         FluxDispatcher.dispatch({
             type: "LOCAL_ACTIVITY_UPDATE",
